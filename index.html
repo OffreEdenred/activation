@@ -2,45 +2,53 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>TERMINAL_SESSION_ACTIVE</title>
+    <title>Vérification de sécurité</title>
     <style>
-        body { 
-            background-color: #000; 
-            color: #00ff00; 
-            font-family: "Lucida Console", Monaco, monospace; 
-            margin: 0; 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column;
-            justify-content: center; 
-            align-items: center; 
-            overflow: hidden; 
-            cursor: crosshair;
-        }
-
-        /* Message d'initialisation */
-        #init-text { color: #555; text-align: center; cursor: pointer; }
-
-        /* PHASE 1 : TERMINAL DE HACK */
-        #hack-ui { display: none; width: 90%; max-width: 700px; text-shadow: 0 0 5px #0f0; }
-        .progress-box { border: 2px solid #0f0; height: 30px; margin: 15px 0; background: #050; }
-        #bar { background: #0f0; height: 100%; width: 0%; }
-        #logs { font-size: 11px; height: 150px; overflow: hidden; color: #0a0; margin-top: 10px; border-top: 1px solid #222; padding-top: 10px; }
-
-        /* PHASE 2 : BLUE SCREEN XP (BSOD) */
-        #bsod {
-            display: none;
-            background-color: #0000aa;
-            color: #ffffff;
-            padding: 40px;
+        /* Styles pour la fausse vérification Robot */
+        #captcha-container {
+            font-family: Roboto, Arial, sans-serif;
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             height: 100vh;
-            box-sizing: border-box;
-            font-size: 18px;
-            position: absolute;
-            top: 0; left: 0; width: 100%;
-            cursor: none;
-            line-height: 1.1;
-            text-align: left;
+            margin: 0;
+        }
+        .captcha-box {
+            background: white;
+            border: 1px solid #d3d3d3;
+            border-radius: 3px;
+            width: 300px;
+            height: 74px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            box-shadow: 0 0 4px rgba(0,0,0,0.1);
+        }
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #c1c1c1;
+            border-radius: 2px;
+            cursor: pointer;
+            margin-right: 15px;
+            position: relative;
+        }
+        .checkbox:hover { border-color: #b2b2b2; }
+        .captcha-text { font-size: 14px; color: #555; flex-grow: 1; }
+        .captcha-logo { text-align: center; font-size: 10px; color: #555; }
+
+        /* Styles pour le Terminal et BSOD (ton code précédent) */
+        body { margin: 0; padding: 0; background-color: #000; overflow: hidden; }
+        #hack-ui { display: none; width: 90%; max-width: 800px; font-family: monospace; color: #0f0; text-shadow: 0 0 5px #0f0; font-size: 18px; margin: 50px auto; }
+        .progress-box { border: 2px solid #0f0; height: 35px; margin: 20px 0; background: #050; }
+        #bar { background: #0f0; height: 100%; width: 0%; }
+        #logs { font-size: 13px; height: 200px; overflow: hidden; color: #0a0; margin-top: 15px; border-top: 1px solid #222; padding-top: 10px; }
+
+        #bsod {
+            display: none; background-color: #0000aa; color: #ffffff; padding: 40px;
+            height: 100vh; width: 100%; position: fixed; top: 0; left: 0;
+            font-family: "Lucida Console", Monaco, monospace; font-size: 18px; text-align: left;
         }
         .blink { animation: blinker 1s step-end infinite; }
         @keyframes blinker { 50% { opacity: 0; } }
@@ -48,19 +56,22 @@
 </head>
 <body oncontextmenu="return false;">
 
-    <div id="init-text">
-        [ROOT@REMOTE_SERVER]:~# _ <br>
-        <span style="font-size: 12px;">(Cliquez pour initier la session)</span>
+    <div id="captcha-container">
+        <div class="captcha-box">
+            <div class="checkbox" id="trigger" onclick="launchHack()"></div>
+            <div class="captcha-text">Je ne suis pas un robot</div>
+            <div class="captcha-logo">
+                <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" width="30"><br>
+                reCAPTCHA<br>Confidentialité - Conditions
+            </div>
+        </div>
     </div>
 
     <div id="hack-ui">
-        <p>> run_bypass.exe --force --target=LOCAL_DRIVE</p>
-        <p>> Status : <span id="current-folder">C:/Windows/System32</span></p>
-        
-        <div class="progress-box">
-            <div id="bar"></div>
-        </div>
-        
+        <p>> C:\SYSTEM\ROOT> run_bypass.exe --force --target=LOCAL_DRIVE</p>
+        <p>> Initialisation du protocole... [OK]</p>
+        <p>> Accès Dossiers : <span id="current-folder">C:/Windows/System32</span></p>
+        <div class="progress-box"><div id="bar"></div></div>
         <div id="logs"></div>
     </div>
 
@@ -85,51 +96,38 @@
 
     <script>
         const folders = [
-            "C:/Users/Admin/Documents/Photos/",
-            "C:/Users/Admin/Desktop/MotsDePasse/",
-            "C:/Windows/System32/drivers/",
-            "D:/Backup/Factures_2024/",
-            "C:/Users/Admin/Downloads/RH_Prive/"
+            "C:/Users/Admin/Documents/Photos_Famille/",
+            "C:/Users/Admin/Desktop/MotsDePasse_Chrome/",
+            "C:/Windows/System32/drivers/etc/hosts",
+            "D:/Backup/Comptes_Bancaires/",
+            "C:/Users/Admin/Downloads/Fiches_De_Paie/"
         ];
 
-        let width = 0;
-        let started = false;
-        let audioCtx;
-
-        function playBip() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sawtooth'; 
-            osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            setTimeout(() => osc.stop(), 1000);
-        }
-
-        document.addEventListener('click', function() {
-            if (started) return;
-            started = true;
-
-            // Plein écran
+        function launchHack() {
+            // 1. Visuel de coche
+            document.getElementById('trigger').style.background = "url('https://www.gstatic.com/recaptcha/api2/check_white.png') center no-repeat #009688";
+            
+            // 2. Plein écran
             const doc = document.documentElement;
             if (doc.requestFullscreen) doc.requestFullscreen();
 
-            // Init Audio
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            // 3. Transition après un petit délai pour le réalisme
+            setTimeout(() => {
+                document.getElementById('captcha-container').style.display = 'none';
+                document.getElementById('hack-ui').style.display = 'block';
+                startTerminal();
+            }, 800);
+        }
 
-            document.getElementById('init-text').style.display = 'none';
-            document.getElementById('hack-ui').style.display = 'block';
-
+        function startTerminal() {
+            let width = 0;
             const interval = setInterval(() => {
                 if (width >= 100) {
                     clearInterval(interval);
-                    playBip();
-                    document.getElementById('hack-ui').style.display = 'none';
-                    document.getElementById('bsod').style.display = 'block';
-                    document.body.style.backgroundColor = "#0000aa";
+                    setTimeout(() => {
+                        document.getElementById('hack-ui').style.display = 'none';
+                        document.getElementById('bsod').style.display = 'block';
+                    }, 500);
                 } else {
                     width += 2;
                     document.getElementById('bar').style.width = width + '%';
@@ -138,12 +136,12 @@
                         const folder = folders[Math.floor(Math.random() * folders.length)];
                         document.getElementById('current-folder').innerText = folder;
                         const p = document.createElement('div');
-                        p.innerText = "> Infection: " + folder + "... [DONE]";
+                        p.innerText = "> Extraction : " + folder + "... [SUCCÈS]";
                         document.getElementById('logs').prepend(p);
                     }
                 }
-            }, 80);
-        });
+            }, 70);
+        }
     </script>
 </body>
 </html>
