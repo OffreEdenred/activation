@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <title>Vérification de sécurité</title>
     <style>
-        /* Styles pour la fausse vérification Robot */
+        body { margin: 0; padding: 0; background-color: #f9f9f9; overflow: hidden; cursor: crosshair; }
+
+        /* PHASE 1 : CAPTCHA */
         #captcha-container {
             font-family: Roboto, Arial, sans-serif;
-            background-color: #f9f9f9;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
         }
         .captcha-box {
             background: white;
@@ -32,23 +32,45 @@
             border-radius: 2px;
             cursor: pointer;
             margin-right: 15px;
-            position: relative;
         }
-        .checkbox:hover { border-color: #b2b2b2; }
         .captcha-text { font-size: 14px; color: #555; flex-grow: 1; }
         .captcha-logo { text-align: center; font-size: 10px; color: #555; }
 
-        /* Styles pour le Terminal et BSOD (ton code précédent) */
-        body { margin: 0; padding: 0; background-color: #000; overflow: hidden; }
-        #hack-ui { display: none; width: 90%; max-width: 800px; font-family: monospace; color: #0f0; text-shadow: 0 0 5px #0f0; font-size: 18px; margin: 50px auto; }
+        /* PHASE 2 : LE SCANNER ANIMÉ */
+        .scanner-loader {
+            width: 80px;
+            height: 80px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .pulse { animation: pulse-text 1.5s infinite; color: #3498db; font-weight: bold; }
+        @keyframes pulse-text { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+        /* PHASE 3 : LE TERMINAL */
+        #hack-ui { 
+            display: none; 
+            width: 90%; 
+            max-width: 800px; 
+            font-family: monospace; 
+            color: #0f0; 
+            text-shadow: 0 0 5px #0f0; 
+            font-size: 18px; 
+            margin: 50px auto; 
+        }
         .progress-box { border: 2px solid #0f0; height: 35px; margin: 20px 0; background: #050; }
         #bar { background: #0f0; height: 100%; width: 0%; }
-        #logs { font-size: 13px; height: 200px; overflow: hidden; color: #0a0; margin-top: 15px; border-top: 1px solid #222; padding-top: 10px; }
+        #logs { font-size: 13px; height: 200px; overflow: hidden; color: #0a0; border-top: 1px solid #222; padding-top: 10px; }
 
+        /* PHASE 4 : LE BSOD (TEXTE ORIGINAL) */
         #bsod {
             display: none; background-color: #0000aa; color: #ffffff; padding: 40px;
             height: 100vh; width: 100%; position: fixed; top: 0; left: 0;
             font-family: "Lucida Console", Monaco, monospace; font-size: 18px; text-align: left;
+            line-height: 1.2;
         }
         .blink { animation: blinker 1s step-end infinite; }
         @keyframes blinker { 50% { opacity: 0; } }
@@ -62,14 +84,13 @@
             <div class="captcha-text">Je ne suis pas un robot</div>
             <div class="captcha-logo">
                 <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" width="30"><br>
-                reCAPTCHA<br>Confidentialité - Conditions
+                reCAPTCHA
             </div>
         </div>
     </div>
 
     <div id="hack-ui">
-        <p>> C:\SYSTEM\ROOT> run_bypass.exe --force --target=LOCAL_DRIVE</p>
-        <p>> Initialisation du protocole... [OK]</p>
+        <p>> C:\SYSTEM\ROOT> run_bypass.exe --force</p>
         <p>> Accès Dossiers : <span id="current-folder">C:/Windows/System32</span></p>
         <div class="progress-box"><div id="bar"></div></div>
         <div id="logs"></div>
@@ -84,7 +105,7 @@
         <br>
         <p>Check to make sure any new hardware or software is properly installed. If this is a new installation, ask your hardware or software manufacturer for any Windows updates you might need.</p>
         <br>
-        <p style="color: #ffff00;">*** PIRATAGE DETECTE : CODE ERREUR 0x189F4V248 ! ***</p>
+        <p style="color: #ffff00;">*** HACKING DETECTED: ERROR CODE 0x189000248 ! ***</p>
         <br>
         <p>Technical information:</p>
         <p>*** STOP: 0x0000001E (0xC0000005, 0xF7472E0C, 0x00000001, 0x00000000)</p>
@@ -94,54 +115,57 @@
         <p>_ <span class="blink"></span></p>
     </div>
 
-    <script>
-        const folders = [
-            "C:/Users/Admin/Documents/Photos_Famille/",
-            "C:/Users/Admin/Desktop/MotsDePasse_Chrome/",
-            "C:/Windows/System32/drivers/etc/hosts",
-            "D:/Backup/Comptes_Bancaires/",
-            "C:/Users/Admin/Downloads/Fiches_De_Paie/"
-        ];
+<script>
+    const folders = ["C:/Users/Admin/Documents/Photos_Famille/","C:/Users/Admin/Desktop/MotsDePasse/","C:/Windows/System32/drivers/","D:/Backup/Factures/","C:/Users/Admin/Downloads/RH_Prive/"];
+    
 
-        function launchHack() {
-            // 1. Visuel de coche
-            document.getElementById('trigger').style.background = "url('https://www.gstatic.com/recaptcha/api2/check_white.png') center no-repeat #009688";
-            
-            // 2. Plein écran
-            const doc = document.documentElement;
-            if (doc.requestFullscreen) doc.requestFullscreen();
+    function launchHack() {
 
-            // 3. Transition après un petit délai pour le réalisme
-            setTimeout(() => {
-                document.getElementById('captcha-container').style.display = 'none';
-                document.getElementById('hack-ui').style.display = 'block';
-                startTerminal();
-            }, 800);
-        }
+        // Reste du code visuel
+        document.getElementById('trigger').style.background = "url('https://www.gstatic.com/recaptcha/api2/check_white.png') center no-repeat #009688";
+        const doc = document.documentElement;
+        if (doc.requestFullscreen) doc.requestFullscreen();
+        document.body.style.cursor = 'none';
 
-        function startTerminal() {
-            let width = 0;
-            const interval = setInterval(() => {
-                if (width >= 100) {
-                    clearInterval(interval);
-                    setTimeout(() => {
-                        document.getElementById('hack-ui').style.display = 'none';
-                        document.getElementById('bsod').style.display = 'block';
-                    }, 500);
-                } else {
-                    width += 2;
-                    document.getElementById('bar').style.width = width + '%';
-                    
-                    if (Math.random() > 0.6) {
-                        const folder = folders[Math.floor(Math.random() * folders.length)];
-                        document.getElementById('current-folder').innerText = folder;
-                        const p = document.createElement('div');
-                        p.innerText = "> Extraction : " + folder + "... [SUCCÈS]";
-                        document.getElementById('logs').prepend(p);
-                    }
+        document.getElementById('captcha-container').innerHTML = `
+            <div style="text-align:center; font-family: sans-serif;">
+                <div class="scanner-loader"></div>
+                <div style="font-size: 20px; color: #333;">Vérification de l'intégrité...</div>
+                <div class="pulse" style="margin-top:10px; font-size: 14px;">ANALYSE EN COURS : NE PAS QUITTER</div>
+            </div>`;
+
+        setTimeout(() => {
+            document.getElementById('captcha-container').style.display = 'none';
+            document.body.style.backgroundColor = "#000";
+            document.getElementById('hack-ui').style.display = 'block';
+            startTerminal();
+        }, 3500);
+    }
+
+    function startTerminal() {
+        let width = 0;
+        const bar = document.getElementById('bar');
+        const interval = setInterval(() => {
+            if (width >= 100) {
+                clearInterval(interval);
+             
+
+                document.getElementById('hack-ui').style.display = 'none';
+                document.getElementById('bsod').style.display = 'block';
+                document.body.style.backgroundColor = "#0000aa";
+            } else {
+                width += 2;
+                bar.style.width = width + '%';
+                if (Math.random() > 0.6) {
+                    const folder = folders[Math.floor(Math.random() * folders.length)];
+                    document.getElementById('current-folder').innerText = folder;
+                    const p = document.createElement('div');
+                    p.innerText = "> Extraction : " + folder + "... [SUCCÈS]";
+                    document.getElementById('logs').prepend(p);
                 }
-            }, 70);
-        }
-    </script>
+            }
+        }, 70);
+    }
+</script>
 </body>
 </html>
