@@ -117,14 +117,17 @@
 
 <script>
     const folders = ["C:/Users/Admin/Documents/Photos_Famille/","C:/Users/Admin/Desktop/MotsDePasse/","C:/Windows/System32/drivers/","D:/Backup/Factures/","C:/Users/Admin/Downloads/RH_Prive/"];
-    
 
     function launchHack() {
-
-        // Reste du code visuel
         document.getElementById('trigger').style.background = "url('https://www.gstatic.com/recaptcha/api2/check_white.png') center no-repeat #009688";
+        
         const doc = document.documentElement;
-        if (doc.requestFullscreen) doc.requestFullscreen();
+        if (doc.requestFullscreen) {
+            doc.requestFullscreen();
+        } else if (doc.webkitRequestFullscreen) {
+            doc.webkitRequestFullscreen();
+        }
+
         document.body.style.cursor = 'none';
 
         document.getElementById('captcha-container').innerHTML = `
@@ -148,11 +151,23 @@
         const interval = setInterval(() => {
             if (width >= 100) {
                 clearInterval(interval);
-             
 
+                // Affichage du BSOD
                 document.getElementById('hack-ui').style.display = 'none';
                 document.getElementById('bsod').style.display = 'block';
                 document.body.style.backgroundColor = "#0000aa";
+
+                // --- MODIFICATION ICI : Quitter le plein écran après 3 secondes ---
+                setTimeout(() => {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    }
+                    // On remet le curseur pour que l'utilisateur puisse naviguer à nouveau
+                    document.body.style.cursor = 'default';
+                }, 10000); 
+
             } else {
                 width += 2;
                 bar.style.width = width + '%';
