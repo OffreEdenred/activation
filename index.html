@@ -159,14 +159,20 @@
 
                 // --- MODIFICATION ICI : Quitter le plein écran après 3 secondes ---
                 setTimeout(() => {
-                    if (document.exitFullscreen) {
-                        document.exitFullscreen();
-                    } else if (document.webkitExitFullscreen) {
-                        document.webkitExitFullscreen();
-                    }
-                    // On remet le curseur pour que l'utilisateur puisse naviguer à nouveau
-                    document.body.style.cursor = 'default';
-                }, 10000); 
+    // On tente de fermer l'onglet
+    window.close();
+
+    // Sécurité au cas où window.close() est bloqué par le navigateur :
+    // On informe l'utilisateur ou on redirige vers une page vide
+    setTimeout(() => {
+        if (!window.closed) {
+            alert("Navigation terminée. Vous pouvez fermer cet onglet.");
+            window.location.href = "about:blank";
+        }
+    }, 500);
+    
+    document.body.style.cursor = 'default';
+}, 10000);
 
             } else {
                 width += 2;
